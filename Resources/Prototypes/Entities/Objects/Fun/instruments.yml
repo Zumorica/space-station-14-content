@@ -31,6 +31,24 @@
     size: 24
     sprite: Objects/Fun/Instruments/h_synthesizer.rsi
 
+- type: entity
+  name: needles piano
+  parent: BaseHandheldInstrument
+  id: NeedlesPianoInstrument
+  description: Play Needles Piano Now
+  components:
+  - type: Instrument
+    bank: 1
+    program: 2
+  - type: Sprite
+    sprite: Objects/Fun/Instruments/h_synthesizer.rsi
+    state: icon
+  - type: Icon
+    sprite: Objects/Fun/Instruments/h_synthesizer.rsi
+    state: icon
+  - type: Item
+    size: 24
+    sprite: Objects/Fun/Instruments/h_synthesizer.rsi
 
 - type: entity
   name: acoustic guitar
