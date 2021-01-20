@@ -169,6 +169,9 @@ namespace Content.Client
             "Flammable",
             "CreamPie",
             "CreamPied",
+            "Smoking",
+            "Matchstick",
+            "Matchbox",
             "BlockGameArcade",
             "KitchenSpike",
             "Butcherable",
@@ -232,7 +235,11 @@ namespace Content.Client
             "SliceableFood",
             "DamageOtherOnHit",
             "DamageOnLand",
-            "Recyclable"
+            "GasFilter",
+            "Recyclable",
+            "SecretStash",
+            "Toilet",
+            "ClusterFlash"
         };
     }
 }
