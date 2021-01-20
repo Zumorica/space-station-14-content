@@ -9,6 +9,7 @@ using Robust.Client.Graphics.Drawing;
 using Robust.Client.Input;
 using Robust.Client.Interfaces.Input;
 using Robust.Client.Interfaces.ResourceManagement;
+using Robust.Client.Interfaces.UserInterface;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
 using Robust.Shared.Input;
@@ -96,6 +97,7 @@ namespace Content.Client.UserInterface
         private Button _combatModeButton;
         private VBoxContainer _combatPanelContainer;
 
+        [Dependency] private readonly IUserInterfaceManager _userInterfaceManager = default!;
         [Dependency] private readonly IResourceCache _resourceCache = default!;
         [Dependency] private readonly IInputManager _inputManager = default!;
 

@@ -4,7 +4,9 @@ using Content.Client.UserInterface;
 using Content.Shared.Input;
 using Robust.Client.Interfaces.Input;
 using Robust.Client.Interfaces.UserInterface;
+using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
+using Robust.Client.UserInterface.CustomControls;
 using Robust.Shared.Input.Binding;
 using Robust.Shared.IoC;
 using Robust.Shared.Localization;
@@ -19,21 +21,43 @@ namespace Content.Client.State
         [Dependency] private readonly IInputManager _inputManager = default!;
         [Dependency] private readonly IChatManager _chatManager = default!;
 
+        private ViewportContainer _viewport;
         [ViewVariables] private ChatBox _gameChat;
+        [ViewVariables] private HSplitContainer _root;
+
 
         public override void Startup()
         {
             base.Startup();
 
-            _gameChat = new ChatBox();
+            _root = new HSplitContainer()
+            {
+                MouseFilter = Control.MouseFilterMode.Ignore
+            };
+            LayoutContainer.SetAnchorAndMarginPreset(_root, LayoutContainer.LayoutPreset.Wide);
 
-            _userInterfaceManager.StateRoot.AddChild(_gameChat);
-            LayoutContainer.SetAnchorAndMarginPreset(_gameChat, LayoutContainer.LayoutPreset.TopRight, margin: 10);
-            LayoutContainer.SetAnchorAndMarginPreset(_gameChat, LayoutContainer.LayoutPreset.TopRight, margin: 10);
-            LayoutContainer.SetMarginLeft(_gameChat, -475);
-            LayoutContainer.SetMarginBottom(_gameChat, 235);
+            _gameChat = new ChatBox()
+            {
+                MouseFilter = Control.MouseFilterMode.Ignore
+            };
 
-            _userInterfaceManager.StateRoot.AddChild(_gameHud.RootControl);
+            _viewport = _userInterfaceManager.MainViewport;
+            _viewport.SizeFlagsStretchRatio = 0.60f;
+            _viewport.Parent!.RemoveChild(_userInterfaceManager.MainViewport);
+
+            _root.AddChild(_userInterfaceManager.MainViewport);
+            LayoutContainer.SetAnchorPreset(_userInterfaceManager.MainViewport, LayoutContainer.LayoutPreset.Wide);
+
+            _root.AddChild(_gameChat);
+            //LayoutContainer.SetAnchorAndMarginPreset(_gameChat, LayoutContainer.LayoutPreset.TopRight, margin: 10);
+            //LayoutContainer.SetAnchorAndMarginPreset(_gameChat, LayoutContainer.LayoutPreset.TopRight, margin: 10);
+            //LayoutContainer.SetMarginLeft(_gameChat, -475);
+            //LayoutContainer.SetMarginBottom(_gameChat, 235);
+
+            _viewport.AddChild(_gameHud.RootControl);
+
+            _userInterfaceManager.StateRoot.AddChild(_root);
+
             _chatManager.SetChatBox(_gameChat);
             _gameChat.DefaultChatFormat = "say \"{0}\"";
             _gameChat.Input.PlaceHolder = Loc.GetString("Say something! [ for OOC");
