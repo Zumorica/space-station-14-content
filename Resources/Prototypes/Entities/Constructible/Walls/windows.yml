@@ -62,9 +62,9 @@
   components:
   - type: Sprite
     drawdepth: WallTops
-    sprite: Constructible/Structures/Windows/reinforced_window.rsi
+    sprite: Constructible/Structures/Windows/rglass.rsi
   - type: Icon
-    sprite: Constructible/Structures/Windows/reinforced_window.rsi
+    sprite: Constructible/Structures/Windows/rglass.rsi
   - type: Damageable
     resistances: metallicResistances
   - type: Destructible
@@ -155,13 +155,19 @@
     resistances: metallicResistances
   - type: Destructible
     thresholds:
-      15:
-        SoundCollection: GlassBreak
-        Spawn:
-          ShardGlass:
-            Min: 1
-            Max: 2
-        Acts: ["Destruction"]
+      - trigger:
+          !type:TotalDamageTrigger
+          damage: 15
+        behaviors:
+          - !type:PlaySoundCollectionBehavior
+            soundCollection: GlassBreak
+          - !type:SpawnEntitiesBehavior
+            spawn:
+              ShardGlassReinforced:
+                min: 1
+                max: 2
+          - !type:DoActsBehavior
+            acts: [ "Destruction" ]
   - type: SnapGrid
     offset: Center
   - type: Airtight
@@ -192,13 +198,19 @@
     resistances: metallicResistances
   - type: Destructible
     thresholds:
-      75:
-        SoundCollection: GlassBreak
-        Spawn:
-          ShardGlassReinforced:
-            Min: 1
-            Max: 2
-        Acts: ["Destruction"]
+      - trigger:
+          !type:TotalDamageTrigger
+          damage: 75
+        behaviors:
+          - !type:PlaySoundCollectionBehavior
+            soundCollection: GlassBreak
+          - !type:SpawnEntitiesBehavior
+            spawn:
+              ShardGlassReinforced:
+                min: 1
+                max: 2
+          - !type:DoActsBehavior
+            acts: [ "Destruction" ]
 #  - type: Window
 #    base: rglass
 #    maxDamage: 75
