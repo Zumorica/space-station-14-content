@@ -8,7 +8,7 @@
     - type: Input
       context: "human"
     - type: PlayerMobMover
-    - type: PlayerInputMover
+    - type: PlayerInputTileMover
     - type: Alerts
     - type: Actions
       innateActions:

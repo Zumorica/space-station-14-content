@@ -20,7 +20,7 @@
       mass: 5
       mask:
       - GhostImpassable
-  - type: PlayerInputMover
+  - type: PlayerInputTileMover
   - type: Eye
     drawFov: false
   - type: Input

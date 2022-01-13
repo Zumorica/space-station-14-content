@@ -11,7 +11,7 @@
   - type: Input
     context: "human"
   - type: PlayerMobMover
-  - type: PlayerInputMover
+  - type: PlayerInputTileMover
   - type: MovementSpeedModifier
     baseWalkSpeed : 7
     baseSprintSpeed : 7

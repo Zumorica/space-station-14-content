@@ -16,7 +16,7 @@
     innateActions:
     - CombatMode
     - GhostBoo
-  - type: PlayerInputMover
+  - type: PlayerInputTileMover
   - type: Physics
     bodyType: Kinematic
     status: InAir
