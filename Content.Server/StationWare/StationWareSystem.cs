@@ -2,6 +2,8 @@ using System.Linq;
 using Content.Server.Players;
 using Content.Server.StationWare.Components;
 using Content.Shared.StationWare;
+using Robust.Server.GameObjects;
+using Robust.Server.Maps;
 using Robust.Server.Player;
 using Robust.Shared.Enums;
 using Robust.Shared.Map;
@@ -19,7 +21,10 @@ public sealed partial class StationWareSystem : SharedStationWareSystem
     [Dependency] private readonly IPlayerManager _playerMan = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly IMapManager _mapManager = default!;
+    [Dependency] private readonly IMapLoader _mapLoader = default!;
     [Dependency] private readonly IGameTiming _gameTiming = default!;
+
+    [Dependency] private readonly ActorSystem _actorSystem = default!;
 
     private StationWareMiniGame[] _minigames = Array.Empty<StationWareMiniGame>();
 
@@ -68,7 +73,7 @@ public sealed partial class StationWareSystem : SharedStationWareSystem
         RemovePlayer(map, e.Session, ware);
     }
 
-    public EntityUid CreateStationWareMap()
+    public EntityUid? CreateStationWareMap()
     {
         var mapId = _mapManager.CreateMap();
         var mapUid = _mapManager.GetMapEntityId(mapId);
@@ -77,8 +82,16 @@ public sealed partial class StationWareSystem : SharedStationWareSystem
 
         // TODO: Cvar with set time
         ware.NextRunLevelTime = _gameTiming.CurTime + TimeSpan.FromSeconds(30);
-
         Dirty(ware);
+
+        // We spawn it at 0,0 'cause why not.
+        // TODO: Replace path by actual path... Whenever the game becomes stable enough to map or something lmao
+        var (_, gridID) = _mapLoader.LoadBlueprint(mapId, "/PATH/TO/LOBBY");
+
+        if (!gridID.GetValueOrDefault().IsValid())
+            return null;
+
+        ware.Lobby = _mapManager.GetGridEuid(gridID!.Value);
 
         return mapUid;
     }
@@ -114,6 +127,9 @@ public sealed partial class StationWareSystem : SharedStationWareSystem
 
         ware.RunLevel = StationWareRunLevel.GamePrepareLobby;
         Dirty(ware);
+
+        // Ensure everyone is in the lobby!
+        SendPlayersToLobby(map, ware);
     }
 
     /// <summary>
@@ -151,7 +167,59 @@ public sealed partial class StationWareSystem : SharedStationWareSystem
 
         // TODO: do something with the winners here (give them points, show their names or something?)
 
+        SendPlayersToLobby(map, ware);
+
         return winners;
+    }
+
+    private void SendPlayersToLobby(EntityUid map, StationWareMapComponent? ware = null)
+    {
+        if (!Resolve(map, ref ware))
+            return;
+
+        var spawnPoints = GetSpawnPoints(map);
+
+        var lobbyGrid = _mapManager.GetGridComp(ware.Lobby).GridIndex;
+
+        foreach (var player in ware.Players)
+        {
+            if (player.AttachedEntityTransform is {} oldXform)
+            {
+                if (oldXform.GridID == lobbyGrid)
+                    continue; // TODO: Actually check that they are alive, not a ghost, etc...
+            }
+
+            var point = _random.Pick(spawnPoints);
+
+            // TODO: Make a custom mob prototype for stationware, or something. Also maybe do like GameTicker here?
+            var mob = Spawn("MobHuman", point);
+
+            // TODO: Use minds or something.
+            _actorSystem.Attach(mob, player);
+        }
+
+        // TODO: Handle observers here!
+    }
+
+    private EntityCoordinates[] GetSpawnPoints(EntityUid map)
+    {
+        var mapComp = Comp<MapComponent>(map);
+        var mapId = mapComp.WorldMap;
+
+        var list = new ValueList<EntityCoordinates>();
+
+        foreach (var spawnPoint in EntityQuery<StationWareLobbySpawnPointComponent>(true))
+        {
+            var uid = spawnPoint.Owner;
+            var xform = Transform(uid);
+
+            if (xform.MapID != mapId)
+                continue;
+
+            list.Add(xform.Coordinates);
+        }
+
+        return list.ToArray();
     }
 
     public void NextStationWareRound(EntityUid map, StationWareMapComponent? ware = null)

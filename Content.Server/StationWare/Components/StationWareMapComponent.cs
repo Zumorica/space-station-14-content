@@ -15,6 +15,11 @@ public sealed class StationWareMapComponent : SharedStationWareMapComponent
     [ViewVariables] public HashSet<IPlayerSession> Players { get; } = default!;
 
     /// <summary>
+    ///     UID of the main StationWare lobby grid.
+    /// </summary>
+    [ViewVariables] public EntityUid Lobby = EntityUid.Invalid;
+
+    /// <summary>
     ///     People observing the minigames.
     /// </summary>
     //[ViewVariables] public IEnumerable<IPlayerSession> Observers { get; } = default!;
